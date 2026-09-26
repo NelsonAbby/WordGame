@@ -9,7 +9,7 @@ public class Turn {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println(host.getFirstName() + " says, " + player.getFirstName() + ", take a guess between 0 and 100:");
-        int guess = scanner.nextInt;
+        int guess = scanner.nextInt();
 
         Numbers numbers = new Numbers();
 
@@ -23,7 +23,7 @@ public class Turn {
         }
         else {
             player.setMoney(player.getMoney() - losingAmount);
-            
+
             System.out.println(player);
             return false;
         }

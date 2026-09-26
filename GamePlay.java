@@ -1,14 +1,20 @@
 import java.util.Scanner;
 
 public class GamePlay {
-    private Person person;
+    private Players player;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
+        //New host
+        Hosts host = new Hosts("Alex");
+        host.randomizeNum();
+
+        //Get playrs first name
         System.out.print("Enter your first name: ");
         String firstName = scanner.nextLine();
 
+        //optional last name
         System.out.print("Would you like to enter a last name? (y/n): ");
         String answer = scanner.nextLine();
 
@@ -18,24 +24,34 @@ public class GamePlay {
             System.out.print("Enter your last name: ");
             String lastName = scanner.nextLine();
 
-            game.person = new Person(firstName, lastName);
+            game.player = new Players(firstName, lastName);
         }
         else {
-            game.person = new Person(firstName);
+            game.player = new Players(firstName);
         }
 
-        Numbers numbers = new Numbers();
-        numbers.generateNumber();
+        Turn turn = new Turn();
 
-        boolean correct = false;
+        boolean playAgain = true;
 
-        while(!correct) {
-            System.out.print(game.person.getFirstName() + ", enter your guess: ");
-            int guess = scanner.nextInt();
+        while(playAgain) {
+            boolean correct = false;
 
-            correct = numbers.compareNumber(guess);
+            while(!correct) {
+                correct = turn.takeTurn(game.player, host);
         }
 
-        scanner.close();
+        System.out.print("Want to play again? (y/n)");
+        String again = scanner.next();
+
+        if (again.equalsIgnoreCase("y")){
+            host.randomizeNum();
+        }
+        else {
+            playAgain = false;
+        }
     }
+
+    System.out.println("Play again soon!");
+}
 }
