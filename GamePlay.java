@@ -1,53 +1,68 @@
 import java.util.Scanner;
 
 public class GamePlay {
-    private Players player;
+    private Players[]currentPlayers = new Players[3];
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        //New host
-        Hosts host = new Hosts("Alex");
-        host.randomizeNum();
-
-        //Get playrs first name
-        System.out.print("Enter your first name: ");
-        String firstName = scanner.nextLine();
-
-        //optional last name
-        System.out.print("Would you like to enter a last name? (y/n): ");
-        String answer = scanner.nextLine();
-
         GamePlay game = new GamePlay();
 
-        if (answer.equalsIgnoreCase("y")) {
-            System.out.print("Enter your last name: ");
-            String lastName = scanner.nextLine();
+        //New host
+        Hosts host = new Hosts("Alex");
+        
+        System.out.println("Welcome to WordGame!");
+        System.out.println();
 
-            game.player = new Players(firstName, lastName);
+        for (int i =0; i < 3; i++) {
+
+            //Get players first name
+            System.out.print("Player " + (i + 1) + ": Enter your first name: ");
+            String firstName = scanner.nextLine();
+
+            //optional last name
+            System.out.print("Would you like to enter a last name? (y/n): ");
+            String answer = scanner.nextLine();
+
+            if (answer.equalsIgnoreCase("y")) {
+                System.out.print("Enter your last name: ");
+                String lastName = scanner.nextLine();
+
+                game.currentPlayers[i] = new Players(firstName, lastName);
+            }
+            
+            else {
+                game.currentPlayers[i] = new Players(firstName);
+            }
         }
-        else {
-            game.player = new Players(firstName);
-        }
 
-        Turn turn = new Turn();
+            Turn turn = new Turn(scanner);
 
-        boolean playAgain = true;
+            boolean playAgain = true;
 
-        while(playAgain) {
-            boolean correct = false;
+            while(playAgain) {
+                host.randomizeNum();
 
-            while(!correct) {
-                correct = turn.takeTurn(game.player, host);
-        }
+                boolean winner = false;
+
+                while(!winner) {
+                    
+                    for (int i = 0; i < game.currentPlayers.length; i++) {
+
+                        winner = turn.takeTurn(
+                            game.currentPlayers[i],
+                            host
+                        );
+                        if (winner) {
+                            break;
+                        }
+                    }
+            }
 
         System.out.print("Want to play again? (y/n)");
-        String again = scanner.next();
+        String answer = scanner.nextLine();
 
-        if (again.equalsIgnoreCase("y")){
-            host.randomizeNum();
-        }
-        else {
+        if (answer.equalsIgnoreCase("n")){
             playAgain = false;
         }
     }

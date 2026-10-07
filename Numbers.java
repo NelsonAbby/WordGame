@@ -6,7 +6,7 @@ public class Numbers {
     }
 
     public void setRandomNum(int randomNum) {
-        this.randomNum = randomNum;
+        Numbers.randomNum = randomNum;
     }
 
     public void generateNumber() {

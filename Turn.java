@@ -2,11 +2,13 @@ import java.util.Scanner;
 
 public class Turn {
 
-    private int winningAmount = 100;
-    private int losingAmount = 100;
+    private Scanner scanner;
+
+    public Turn(Scanner scanner) {
+        this.scanner = scanner;
+    }
 
     public boolean takeTurn(Players player, Hosts host){
-        Scanner scanner = new Scanner(System.in);
 
         System.out.println(host.getFirstName() + " says, " + player.getFirstName() + ", take a guess between 0 and 100:");
         int guess = scanner.nextInt();
@@ -15,17 +17,26 @@ public class Turn {
 
         boolean correct = numbers.compareNumber(guess);
 
-        if(correct){
-            player.setMoney(player.getMoney() + winningAmount);
+        int moneyChange;
 
-            System.out.println(player);
-            return true;
+        if(Math.random() < 0.5) {
+
+            Money money = new Money();
+
+            moneyChange = money.displayWinnings(player, correct);
+
         }
         else {
-            player.setMoney(player.getMoney() - losingAmount);
+            
+            Physical physical = new Physical();
 
-            System.out.println(player);
-            return false;
+            moneyChange = physical.displayWinnings(player, correct);
         }
+
+        player.setMoney(player.getMoney() + moneyChange);
+
+        System.out.println(player);
+
+        return correct;
     }
 }
