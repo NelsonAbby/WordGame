@@ -7,14 +7,11 @@ public class GamePlay {
         Scanner scanner = new Scanner(System.in);
 
         GamePlay game = new GamePlay();
-
-        //New host
-        Hosts host = new Hosts("Alex");
         
         System.out.println("Welcome to WordGame!");
         System.out.println();
 
-        for (int i =0; i < 3; i++) {
+        for (int i = 0; i < game.currentPlayers.length; i++) {
 
             //Get players first name
             System.out.print("Player " + (i + 1) + ": Enter your first name: ");
@@ -34,14 +31,18 @@ public class GamePlay {
             else {
                 game.currentPlayers[i] = new Players(firstName);
             }
+
+            System.out.println();
         }
+
+        //New host
+        Hosts host = new Hosts("Alex", scanner);
 
             Turn turn = new Turn(scanner);
 
             boolean playAgain = true;
 
             while(playAgain) {
-                host.randomizeNum();
 
                 boolean winner = false;
 
@@ -62,11 +63,18 @@ public class GamePlay {
         System.out.print("Want to play again? (y/n)");
         String answer = scanner.nextLine();
 
-        if (answer.equalsIgnoreCase("n")){
+        if (answer.equalsIgnoreCase("y")){
+            host.enterNewPhrase();
+        }
+
+        else {
             playAgain = false;
         }
+
     }
 
     System.out.println("Play again soon!");
+
+    scanner.close();
 }
 }

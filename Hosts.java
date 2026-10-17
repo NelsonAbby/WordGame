@@ -1,14 +1,32 @@
+import java.util.Scanner;
+
 public class Hosts extends Person{
-    public Hosts(String firstName){
+
+    private Scanner scanner;
+    private Phrases phrases;
+
+    public Hosts(String firstName, Scanner scanner){
         super(firstName);
+        this.scanner = scanner;
+        enterNewPhrase();
     }
 
-    public Hosts(String firstName, String lastName){
-        super(firstName, lastName);
+    public void enterNewPhrase() {
+
+        System.out.println();
+        System.out.println(getFirstName()
+        + ", enter the secret phrase for the players:");
+
+        String phrase = scanner.nextLine();
+
+        Phrases.setGamePhrase(phrase);
+
+        phrases = new Phrases();
+
     }
 
-    public void randomizeNum(){
-        Numbers numbers = new Numbers();
-        numbers.generateNumber();
+    public Phrases getPhrases() {
+        return phrases;
     }
+
 }

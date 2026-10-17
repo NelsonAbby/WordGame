@@ -1,4 +1,5 @@
 public class Money implements Award {
+    
     private int winningAmount = 100;
     private int losingAmount = -100;
 

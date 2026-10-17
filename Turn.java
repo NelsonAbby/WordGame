@@ -10,33 +10,59 @@ public class Turn {
 
     public boolean takeTurn(Players player, Hosts host){
 
-        System.out.println(host.getFirstName() + " says, " + player.getFirstName() + ", take a guess between 0 and 100:");
-        int guess = scanner.nextInt();
+        System.out.println(host.getFirstName() + " says, " + player.getFirstName() + ", guess one letter:");
+        String guess = scanner.nextLine().trim();
 
-        Numbers numbers = new Numbers();
 
-        boolean correct = numbers.compareNumber(guess);
+        Phrases phrases = host.getPhrases();
 
-        int moneyChange;
+        try {
 
-        if(Math.random() < 0.5) {
+            if (guess.length() > 1) {
+                phrases.findLetters(guess);
+            }
 
-            Money money = new Money();
+            if (!guess.matches("[a-zA-z]")) {
+                System.out.println("Enter 1 letter from A to Z");
+                return false;
+            }
 
-            moneyChange = money.displayWinnings(player, correct);
+            boolean winner = phrases.findLetters(guess);
 
-        }
-        else {
+            if (winner) {
+
+                if (Math.random() < 0.5) {
+
+                    Money money = new Money();
+
+                    int moneyChange = money.displayWinnings(player, true);
+
+                    player.setMoney(player.getMoney() + moneyChange);
+                
+                }
+
+                 else {
             
             Physical physical = new Physical();
 
-            moneyChange = physical.displayWinnings(player, correct);
+            int moneyChange = physical.displayWinnings(player, true);
+
+            player.setMoney(player.getMoney() + moneyChange);
+
+            }
+
+            System.out.println(player.toString());
+
         }
 
-        player.setMoney(player.getMoney() + moneyChange);
+        return winner;
 
-        System.out.println(player);
+    } catch (MultipleLettersException e) {
 
-        return correct;
+        System.out.println(e.getMessage());
+        System.out.println("Try again on your next turn.");
+
+        return false;
+        }
     }
 }
