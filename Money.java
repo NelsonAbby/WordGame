@@ -7,15 +7,10 @@ public class Money implements Award {
     public int displayWinnings(Players player, boolean correct) {
 
         if (correct) {
-
-            System.out.println(player.getFirstName() + " won $" + winningAmount + "!");
-
             return winningAmount;
         }
         
         else {
-            System.out.println(player.getFirstName() + " lost $" + Math.abs(losingAmount) + ".");
-
             return losingAmount;
         }
     }

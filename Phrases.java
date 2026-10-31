@@ -8,6 +8,7 @@ public class Phrases {
     }
 
     public Phrases() {
+
         StringBuilder phraseBuilder = new StringBuilder();
 
         for (int i = 0; i < gamePhrase.length(); i++) {
@@ -32,38 +33,29 @@ public class Phrases {
             throw new MultipleLettersException();
         }
 
+        if (!letter.matches("[a-zA-Z]")) {
+            throw new IllegalArgumentException("Please enter one letter");
+        }
+
         StringBuilder updatedPhrase = 
             new StringBuilder(playingPhrase);
 
-        boolean found = false;
-
         for (int i = 0; i < gamePhrase.length(); i++) {
-
-            String currentLetter = 
-                    String.valueOf(gamePhrase.charAt(i));
-
-            if (currentLetter.equalsIgnoreCase(letter)) {
+            if (Character.toLowerCase(gamePhrase.charAt(i)) == Character.toLowerCase(letter.charAt(0))) {
                 updatedPhrase.setCharAt(i, gamePhrase.charAt(i));
-                found = true;
             }
         }
 
         playingPhrase = updatedPhrase.toString();
 
-        if (!found) {
-            System.out.println("Incorrect letter");
-        }
-
-        System.out.println("Phrase: " + playingPhrase);
-
-        if (!playingPhrase.contains("_")) {
-            System.out.println("The phrase has been guessed!");
-            return true;
-        }
-
-        return false;
-
+        return !playingPhrase.contains("_");
+    }
+    
+    public String getPlayingPhrase() {
+        return playingPhrase;
     }
 
-    
+    public String getGamePhrase() {
+        return gamePhrase;
+    }
 }

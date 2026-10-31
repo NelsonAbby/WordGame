@@ -8,28 +8,19 @@ public class Physical implements Award{
         "Cruise Trip"
     };
 
-    public int getRandomPrize() {
-
-        int randomIndex = (int) (Math.random() * prizes.length);
-
-        return randomIndex;
-    }
+    private String lastPrize;
 
     @Override 
     public int displayWinnings(Players player, boolean correct) {
-
-        int prizeIndex = getRandomPrize();
-
         if (correct) {
-            System.out.println(player.getFirstName() + " won a " + prizes[prizeIndex] + "!");
-        }
-
-        else {
-            System.out.println(player.getFirstName() + " lost.");
-
-            System.out.println("You ALMOST won a " + prizes[prizeIndex] + "!");
+            int prizeIndex = (int) (Math.random() * prizes.length);
+            lastPrize = prizes[prizeIndex];
         }
 
         return 0;
+    }
+
+    public String getLastPrize() {
+        return lastPrize;
     }
 }

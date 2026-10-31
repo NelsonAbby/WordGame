@@ -1,26 +1,15 @@
-import java.util.Scanner;
 
 public class Hosts extends Person{
 
-    private Scanner scanner;
     private Phrases phrases;
 
-    public Hosts(String firstName, Scanner scanner){
+    public Hosts(String firstName, String phrase){
         super(firstName);
-        this.scanner = scanner;
-        enterNewPhrase();
+        setNewPhrase(phrase);
     }
 
-    public void enterNewPhrase() {
-
-        System.out.println();
-        System.out.println(getFirstName()
-        + ", enter the secret phrase for the players:");
-
-        String phrase = scanner.nextLine();
-
+    public void setNewPhrase(String phrase) {
         Phrases.setGamePhrase(phrase);
-
         phrases = new Phrases();
 
     }
