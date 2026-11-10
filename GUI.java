@@ -3,6 +3,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 public class GUI extends JFrame{
     
@@ -15,40 +16,97 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
     private JLabel playersLabel;
     private JLabel hostLabel;
     private JLabel phraseLabel;
-
-    private JButton addPlayerButton;
-    private JButton setHostButton;
+    
     private JButton startTurnButton;
+
+    private JMenuBar menuBar;
+    private JMenu gameMenu;
+    private JMenu aboutMenu;
+
+    private JMenuItem addPlayerItem;
+    private JMenuItem setHostItem;
+    private JMenuItem layoutItem;
+
+    private JPanel playerPanel;
+    private JPanel gamePanel;
+    private JPanel messagePanel;
+
+    private JTextArea messageArea;
+    private JScrollPane scrollPane;
+
+    private JCheckBox saveMessagesCheckBox;
 
     public GUI() {
         setTitle("Word Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 350);
-        setLayout(new FlowLayout());
+        setSize(600, 450);
+        setLayout(new BorderLayout(10, 10));
+        
+        //New menu bar added
+        menuBar = new JMenuBar();
+        gameMenu = new JMenu("Game");
+        gameMenu.setMnemonic(KeyEvent.VK_G);
+
+        aboutMenu = new JMenu("About");
+        aboutMenu.setMnemonic(KeyEvent.VK_A);
+
+        addPlayerItem = new JMenuItem("Add Player");
+        setHostItem = new JMenuItem("Add Host");
+        layoutItem = new JMenuItem("Layout");
+
+        gameMenu.add(addPlayerItem); 
+        gameMenu.add(setHostItem);
+
+        aboutMenu.add(layoutItem);
+
+        menuBar.add(gameMenu);
+        menuBar.add(aboutMenu);
+        setJMenuBar(menuBar);
 
         playersLabel = new JLabel("Players: None");
         hostLabel= new JLabel("Host: None");
         phraseLabel = new JLabel("Phrase: Not set");
 
-        addPlayerButton = new JButton("Add Player");
-        setHostButton = new JButton("Set Host / Phrase");
+        //Lesson 7 code replaced
+        //addPlayerButton = new JButton("Add Player");
+        //setHostButton = new JButton("Set Host / Phrase");
         startTurnButton = new JButton("Start Turn");
 
-        add(playersLabel);
-        add(addPlayerButton);
-        add(hostLabel);
-        add(setHostButton);
-        add(phraseLabel);
-        add(startTurnButton);
+        playerPanel = new JPanel(new FlowLayout());
+        gamePanel = new JPanel(new FlowLayout());
+        messagePanel = new JPanel(new BorderLayout());
 
-        addPlayerButton.addActionListener(new ActionListener() {
+        playerPanel.add(playersLabel);
+        playerPanel.add(hostLabel);
+
+        gamePanel.add(phraseLabel);
+        gamePanel.add(startTurnButton);
+
+        messageArea = new JTextArea(10, 40);
+        messageArea.setEditable(false);
+        messageArea.setLineWrap(true);
+        messageArea.setWrapStyleWord(true);
+
+        scrollPane = new JScrollPane(messageArea);
+
+        saveMessagesCheckBox = new JCheckBox("Save Messages");
+        saveMessagesCheckBox.setToolTipText("Check the box here to keep previous game messages visible");
+
+        messagePanel.add(scrollPane, BorderLayout.CENTER);
+        messagePanel.add(saveMessagesCheckBox, BorderLayout.SOUTH);
+
+        add(playerPanel, BorderLayout.NORTH);
+        add(gamePanel, BorderLayout.CENTER);
+        add(messagePanel, BorderLayout.SOUTH);
+
+        addPlayerItem.addActionListener(new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent event) {
                 addPlayer();
             }
         });
 
-        setHostButton.addActionListener(new ActionListener() {
+        setHostItem.addActionListener(new ActionListener() {
             @Override 
             public void actionPerformed(ActionEvent event) {
                 setHost();
@@ -62,11 +120,32 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
             }
         });
 
+        layoutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                JOptionPane.showMessageDialog(
+                    GUI.this,
+                    "I chose this BorderLayout for the main window because " +
+                    "it breaks the game into different sections. " +
+                    "I also used FlowLayout for the smaller panels because " +
+                    "it arranges the sections nicely without having to use complicated positioning."
+                );
+            }
+        });
+
         startTurnButton.setEnabled(false);
 
         setLocationRelativeTo(null);
         setVisible(true);
 
+    }
+
+    private void addMessage(String message) {
+        if (saveMessagesCheckBox.isSelected()) {
+            messageArea.append(message + "\n\n");
+        } else {
+            messageArea.setText(message + "\n\n");
+        }
     }
 
     private void addPlayer() {
@@ -131,15 +210,12 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
             return;
         }
 
-        guess = guess.trim();
         guess = guess.trim().toLowerCase();
 
         if (guessedLetters.contains(guess)) {
-            JOptionPane.showMessageDialog(this, "That letter has already been guessed!");
+            addMessage("That letter has already been guessed!");
             return;
         }
-
-        guessedLetters.add(guess);
 
         try {
             
@@ -147,6 +223,8 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
                 throw new IllegalArgumentException(
                     "Enter one letter from A to Z");
             }
+
+            guessedLetters.add(guess);
                 
             boolean correct = host.getPhrases()
                 .getGamePhrase()
@@ -189,7 +267,7 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
 
                 updatePlayersLabel();
 
-                JOptionPane.showMessageDialog(this, message);
+                addMessage(message);
 
                 int answer = JOptionPane.showConfirmDialog(this, "Want to try again?", "Play Again", JOptionPane.YES_NO_OPTION);
 
@@ -213,15 +291,14 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
                     return;
 
                 } else {
-                    String messageThanks = "Thanks for playing!";
-
-                    JOptionPane.showMessageDialog(this, messageThanks);
+                    addMessage("Thanks for playing!");
+                    startTurnButton.setEnabled(false);
+                    return;
                 }
+            } else {
+                message += "\n\n" + player.toString();
+                addMessage(message);
             }
-
-            message += "\n\n" + player.toString();
-
-            JOptionPane.showMessageDialog(this, message);
 
             currentPlayerIndex++;
 
@@ -231,10 +308,10 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
 
         } catch (MultipleLettersException exception) {
 
-                JOptionPane.showMessageDialog(this, exception.getMessage());
+                addMessage(exception.getMessage());
 
         } catch (IllegalArgumentException exception) {
-                JOptionPane.showMessageDialog(this, exception.getMessage());
+                addMessage(exception.getMessage());
         }
     }
     public static void main(String[] args) {
