@@ -1,9 +1,13 @@
-import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.ArrayList;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.*;
 
 public class GUI extends JFrame{
     
@@ -16,6 +20,7 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
     private JLabel playersLabel;
     private JLabel hostLabel;
     private JLabel phraseLabel;
+    private JLabel animationLabel;
     
     private JButton startTurnButton;
 
@@ -26,6 +31,7 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
     private JMenuItem addPlayerItem;
     private JMenuItem setHostItem;
     private JMenuItem layoutItem;
+    private JMenuItem attributionItem;
 
     private JPanel playerPanel;
     private JPanel gamePanel;
@@ -36,9 +42,26 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
 
     private JCheckBox saveMessagesCheckBox;
 
+    private Clip backgroundMusic;
+
     public GUI() {
         setTitle("Word Game");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override 
+            public void windowClosing(java.awt.event.WindowEvent event) {
+                if (backgroundMusic != null) {
+                    backgroundMusic.stop();
+                    backgroundMusic.close();
+                }
+
+                dispose();
+                System.exit(0);
+            }
+        });
+
+
         setSize(600, 450);
         setLayout(new BorderLayout(10, 10));
         
@@ -53,11 +76,13 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
         addPlayerItem = new JMenuItem("Add Player");
         setHostItem = new JMenuItem("Add Host");
         layoutItem = new JMenuItem("Layout");
+        attributionItem = new JMenuItem("Attribution");
 
         gameMenu.add(addPlayerItem); 
         gameMenu.add(setHostItem);
 
         aboutMenu.add(layoutItem);
+        aboutMenu.add(attributionItem);
 
         menuBar.add(gameMenu);
         menuBar.add(aboutMenu);
@@ -67,9 +92,6 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
         hostLabel= new JLabel("Host: None");
         phraseLabel = new JLabel("Phrase: Not set");
 
-        //Lesson 7 code replaced
-        //addPlayerButton = new JButton("Add Player");
-        //setHostButton = new JButton("Set Host / Phrase");
         startTurnButton = new JButton("Start Turn");
 
         playerPanel = new JPanel(new FlowLayout());
@@ -93,6 +115,7 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
         saveMessagesCheckBox.setToolTipText("Check the box here to keep previous game messages visible");
 
         messagePanel.add(scrollPane, BorderLayout.CENTER);
+        
         messagePanel.add(saveMessagesCheckBox, BorderLayout.SOUTH);
 
         add(playerPanel, BorderLayout.NORTH);
@@ -133,11 +156,119 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
             }
         });
 
+        attributionItem.addActionListener(new ActionListener() {
+            @Override 
+            public void actionPerformed(ActionEvent event) {
+                JOptionPane.showMessageDialog(
+
+                    GUI.this,
+                    "Image Attributions:\n" +
+                    "Beach Image by romaneau from Pixabay\n" +
+                    "TV Image by Tommaso Tabacchi Pixabay\n" +
+                    "New Car image by Pixabay from Pixabay\n" +
+                    "Cruise Image by Ridoe from Pixabay\n" +
+                    "Boat Image by Freddy from Pixabay\n" +
+                    "Sound Attributions:\n" +
+                    "Sunshine and Beaches by MVM Productions from Shutterstock\n",
+                    "Attributions",
+                    JOptionPane.INFORMATION_MESSAGE 
+                );
+            }
+        });
+
         startTurnButton.setEnabled(false);
 
         setLocationRelativeTo(null);
         setVisible(true);
 
+        playBackgroundMusic();
+
+    }
+
+    private void showIncorrectAnimation() {
+
+        animationLabel = new JLabel("INCORRECT");
+
+        animationLabel.setFont(new Font("Arial", Font.BOLD, 36));
+        animationLabel.setForeground(Color.RED);
+        animationLabel.setHorizontalAlignment(JLabel.CENTER);
+
+        gamePanel.add(animationLabel, BorderLayout.SOUTH);
+
+        gamePanel.revalidate();
+        gamePanel.repaint();
+
+        Timer animationTimer = new Timer(150, new ActionListener() {
+
+            int count= 0;
+            
+            @Override 
+            public void actionPerformed(ActionEvent event) {
+
+                count++;
+
+                if (count == 1) {
+                    animationLabel.setForeground(Color.ORANGE);
+                } else if (count == 2) {
+                    animationLabel.setForeground(Color.RED);
+                } else if (count == 3) {
+                    animationLabel.setForeground(Color.ORANGE);
+                } else {
+                    gamePanel.remove(animationLabel);
+                    gamePanel.revalidate();
+                    gamePanel.repaint();
+
+                    Timer timer = (Timer) event.getSource();
+                    timer.stop();
+                }
+            }
+        });
+
+        animationTimer.start();
+            
+        }
+
+    private void playBackgroundMusic() {
+
+        try {
+            File musicFile = new File("sounds/background.wav");
+
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+
+            backgroundMusic = AudioSystem.getClip();
+
+            backgroundMusic.open(audioStream);
+
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            
+        } catch (Exception exception) {
+            addMessage("Background msuic could not be played.");
+        }
+    }
+
+    private void showPrizeImage(String prize) {
+
+        String imageFile = "";
+
+        if (prize.equals("75 inch TV")) {
+            imageFile = "images/tv.jpg";
+        } else if (prize.equals("Beach Vacation")) {
+            imageFile = "images/beach.jpg";
+        } else if (prize.equals("New Car")) {
+            imageFile = "images/car.jpg";
+        } else if (prize.equals("Boat")) {
+            imageFile = "images/boat.jpg";
+        } else if (prize.equals("Cruise Trip")) {
+            imageFile = "image/cruise.jpg";
+        }
+
+        ImageIcon prizeIcon = new ImageIcon(imageFile);
+
+        JLabel imageLabel = new JLabel(prizeIcon);
+
+        JOptionPane.showMessageDialog(
+            this, imageLabel, "You Won A Prize!", JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     private void addMessage(String message) {
@@ -241,6 +372,7 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
                 message = "That guess is correct!";
             } else {
                 message = "Sorry, try again on your next turn.";
+                showIncorrectAnimation();
             }
 
             if (winner) {
@@ -260,7 +392,11 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
 
                     physical.displayWinnings(player, true);
 
-                    message += "WOW! You won a " + physical.getLastPrize() + "!\n";
+                    String prize = physical.getLastPrize();
+
+                    message += "WOW! You won a " + prize + "!\n";
+
+                    showPrizeImage(prize);
                 }
 
                 message += "\n" + player.toString();
@@ -313,7 +449,10 @@ private ArrayList<String> guessedLetters = new ArrayList<>();
         } catch (IllegalArgumentException exception) {
                 addMessage(exception.getMessage());
         }
+
     }
+
+    
     public static void main(String[] args) {
         GUI game = new GUI();
         
